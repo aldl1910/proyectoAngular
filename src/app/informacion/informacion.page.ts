@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { CallNumber } from '@awesome-cordova-plugins/call-number/ngx';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 import * as L from 'leaflet';
 @Component({
   selector: 'app-informacion',
@@ -10,18 +12,42 @@ import * as L from 'leaflet';
 export class InformacionPage implements OnInit {
 
   map: L.Map;
-  constructor(private callNumber:CallNumber) { }
+  userEmail: String = "";
+  userUID: String = "";
+  isLogged: boolean;
 
-  llamada(){
-    this.callNumber.callNumber('4556541648',true)
-    .then(()=> console.log("llamada exitosa"))
-    .catch(() => console.log("error"))
-  }
+  constructor(
+    private authService: AuthService, 
+    public afAuth: AngularFireAuth,
+    private router: Router,) {  }
+
+  
 
   ionViewDidEnter(){
     this.loadMap();
+    this.isLogged = false;
+    this.afAuth.user.subscribe(user =>{
+      if(user){
+        this.userEmail = user.email;
+        this.userUID = user.uid;
+        this.isLogged = true;
+      } 
+    })
   }
   
+  login() {
+    this.router.navigate(["/login"]);
+  }
+
+  logout(){
+    this.authService.doLogout()
+    .then(res => {
+      this.userEmail = "";
+      this.userUID = "";
+      this.isLogged = false;
+      console.log(this.userEmail);
+    }, err => console.log(err));
+  }
   
 
   loadMap() {
@@ -35,21 +61,53 @@ export class InformacionPage implements OnInit {
       shadowAnchor: [4, 62],  // the same for the shadow
       popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
     });
-    let latitud = 69.034716;
-    let longitud = 93.994002;
+    let latitud = 42.534611;
+    let longitud = 1.525853;
     let zoom = 7.18;
     this.map = L.map("mapId").setView([latitud, longitud], zoom);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
         .addTo(this.map);
     var marker = L.marker([latitud, longitud], {icon: greenIcon}).addTo(this.map);
-    marker.bindPopup("<b>Bienvenidos al <br>parque nacional <br> Putorana</b>").openPopup();
-    var circle = L.circle([51.196612, 34.683744], {
-      color: 'red',
+    marker.bindPopup("<b>Bienvenidos a <br>nuestra sede </b>").openPopup();
+    var circle = L.circle([36.674912, -5.445099], {
+      color: 'blue',
       fillColor: '#f03',
       fillOpacity: 0.5,
-      radius: 500
+      radius: 50
     }).addTo(this.map);
-    circle.bindPopup("You wouldn't like to be here");
+    circle.bindPopup("Nuestros concesionarios");
+
+    var circle1 = L.circle([37.392778, -5.996775], {
+      color: 'blue',
+      fillColor: '#f03',
+      fillOpacity: 0.5,
+      radius: 50
+    }).addTo(this.map);
+    circle1.bindPopup("Nuestros concesionarios");
+
+    var circle2 = L.circle([40.391483,  -3.693944], {
+      color: 'blue',
+      fillColor: '#f03',
+      fillOpacity: 0.5,
+      radius: 50
+    }).addTo(this.map);
+    circle2.bindPopup("Nuestros concesionarios");
+
+    var circle3 = L.circle([39.502855,  -0.413761], {
+      color: 'blue',
+      fillColor: '#f03',
+      fillOpacity: 0.5,
+      radius: 50
+    }).addTo(this.map);
+    circle3.bindPopup("Nuestros concesionarios");
+
+    var circle4 = L.circle([42.875053,  -8.542924], {
+      color: 'blue',
+      fillColor: '#f03',
+      fillOpacity: 0.5,
+      radius: 50
+    }).addTo(this.map);
+    circle4.bindPopup("Nuestros concesionarios");
   }
 
   ngOnInit() {

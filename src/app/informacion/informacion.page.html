@@ -7,14 +7,14 @@
 
 <ion-content>
   <ion-item class="lbl1"> 
-    <p>Contáctenos... </p>
-    <ion-button class="btn1" (click)="llamada()"><ion-icon name="call"></ion-icon></ion-button>
+    <p>Contáctenos al número </p>
+    <p><b> &nbsp; +34 653158173</b></p>
   </ion-item>  
 
   <ion-item class="lbl2">
     <p>Encuéntranos... </p>
   </ion-item>
-  <div id="mapId" style="width:100%; height:50%; "></div>
+  <div id="mapId" style="width:100%; height:70%; "></div>
 </ion-content>
 
 <ion-toolbar >
@@ -26,7 +26,12 @@
       </ion-tab-button>
 
 
-      <ion-tab-button tab="login">
+      <ion-tab-button (click)="logout()" *ngIf="this.userUID != '' "tab="login">
+        <ion-icon name="person"></ion-icon>
+        <ion-label>Logged</ion-label>
+      </ion-tab-button>
+
+      <ion-tab-button (click)="login()" *ngIf="this.userUID == ''" tab="login">
         <ion-icon name="person-add"></ion-icon>
         <ion-label>Log in</ion-label>
       </ion-tab-button>

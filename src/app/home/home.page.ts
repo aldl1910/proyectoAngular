@@ -31,14 +31,14 @@ export class HomePage {
     public afAuth: AngularFireAuth) {
     // Crear una herramienta vacía al empezar
     this.tiendaEditando = {} as Tienda;
-    this.obtenerListaHerramientas();
+    this.obtenerListaVehiculos();
     
   }
-  obtenerListaHerramientas(){
-    this.firestoreService.consultar("herramientas").subscribe((resultadoConsultaHerramientas) =>
+  obtenerListaVehiculos(){
+    this.firestoreService.consultar("vehiculos").subscribe((resultadoConsultaVehiculos) =>
     {
       this.arrayColeccionTienda =[];
-      resultadoConsultaHerramientas.forEach((datosTienda: any) => {
+      resultadoConsultaVehiculos.forEach((datosTienda: any) => {
         this.arrayColeccionTienda.push({
           id: datosTienda.payload.doc.id,
           data: datosTienda.payload.doc.data()
@@ -51,17 +51,17 @@ export class HomePage {
     this.router.navigate(['detalle/:id'])
   }
 
-  idHerramientaSelec: string;
+  idVehiculoSelec: string;
 
-  selecHerramienta(herramientaSelec){
-    console.log("Herramienta seleccionada:");
-    console.log(herramientaSelec);
-    this.idHerramientaSelec = herramientaSelec.id;
-    this.tiendaEditando.titulo = herramientaSelec.data.titulo;
-    this.tiendaEditando.precio = herramientaSelec.data.precio;
-    this.tiendaEditando.descripcion = herramientaSelec.data.descripcion;
-    this.tiendaEditando.imagen = herramientaSelec.data.imagen;
-    this.router.navigate(['/detalle', this.idHerramientaSelec]);
+  selecHerramienta(vehiculoSelec){
+    console.log("Vehículo seleccionado:");
+    console.log(vehiculoSelec);
+    this.idVehiculoSelec = vehiculoSelec.id;
+    this.tiendaEditando.marca = vehiculoSelec.data.marca;
+    this.tiendaEditando.modelo = vehiculoSelec.data.modelo;
+    this.tiendaEditando.precio = vehiculoSelec.data.precio;
+    this.tiendaEditando.imagen = vehiculoSelec.data.imagen;
+    this.router.navigate(['/detalle', this.idVehiculoSelec]);
   }
   ionViewDidEnter(){
     this.isLogged = false;

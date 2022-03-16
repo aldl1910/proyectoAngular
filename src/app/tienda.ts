@@ -1,6 +1,6 @@
 export interface Tienda {
     imagen: string;
-    titulo: string;
+    marca: string;
+    modelo: string;
     precio: number;
-    descripcion: string;
 }

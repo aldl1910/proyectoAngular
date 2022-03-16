@@ -3,8 +3,6 @@ import { ActivatedRoute } from '@angular/router';
 import { Tienda } from '../tienda';
 import { FirestoreService } from '../firestore.service';
 import { AlertController, LoadingController, ToastController } from '@ionic/angular';
-import { ImagePicker } from '@awesome-cordova-plugins/image-picker/ngx';
-import { SocialSharing } from '@awesome-cordova-plugins/social-sharing/ngx';
 import { AuthService } from '../services/auth.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Router } from '@angular/router';
@@ -43,8 +41,6 @@ export class DetallePage implements OnInit {
     public alertController: AlertController,
     private loadingController: LoadingController,
     private toastConstroller: ToastController,
-    private imagePicker: ImagePicker,
-    private socialSharing: SocialSharing,
     private authService: AuthService, 
     public afAuth: AngularFireAuth,
     public loadingCtrl: LoadingController,
@@ -57,13 +53,13 @@ export class DetallePage implements OnInit {
     
     this.id = this.activatedRoute.snapshot.paramMap.get('id');
 
-    this.firestoreService.consultarPorId("herramientas", this.id).subscribe((resultado) => {
+    this.firestoreService.consultarPorId("vehiculos", this.id).subscribe((resultado) => {
       // Preguntar si se hay encontrado un document con ese ID
       if(resultado.payload.data() != null) {
         this.document.id = resultado.payload.id
         this.document.data = resultado.payload.data();
         // Como ejemplo, mostrar el título de la tarea en consola
-        console.log(this.document.data.titulo);
+        console.log(this.document.data.marca);
       } else {
         // No se ha encontrado un document con ese ID. Vaciar los datos que hubiera
         this.document.data = {} as Tienda;
@@ -71,11 +67,11 @@ export class DetallePage implements OnInit {
     });
   }
   
-  obtenerListaHerramientas(){
-    this.firestoreService.consultar("herramientas").subscribe((resultadoConsultaHerramientas) =>
+  obtenerListaVehiculos(){
+    this.firestoreService.consultar("vehiculos").subscribe((resultadoConsultaVehiculos) =>
     {
       this.arrayColeccionTienda =[];
-      resultadoConsultaHerramientas.forEach((datosTienda: any) => {
+      resultadoConsultaVehiculos.forEach((datosTienda: any) => {
         this.arrayColeccionTienda.push({
           id: datosTienda.payload.doc.id,
           data: datosTienda.payload.doc.data()
@@ -84,11 +80,11 @@ export class DetallePage implements OnInit {
     });
   }
 
-  idHerramientaSelec: string;
+  idVehiculoSelec: string;
   clicBotonInsertar(){
-    return this.firestoreService.insertar("herramientas", this.document.data).then(
+    return this.firestoreService.insertar("vehiculos", this.document.data).then(
       ()=> {
-        console.log("Herramienta creada correctamente");
+        console.log("Vehículo creado correctamente");
         // Limpiar el contenido de la herramienta que se estaba editando
         this.tiendaEditando = {} as Tienda;
       }, (error) => {
@@ -98,9 +94,9 @@ export class DetallePage implements OnInit {
   }
   clicBotonBorrar(){
     this.alertController.create({
-      header: 'Confirm Alert',
-      subHeader: 'Beware lets confirm',
-      message: 'Are you sure? you want to leave without safty mask?',
+      header: 'Alerta de confirmacion',
+      subHeader: 'Confirmaremos si procedemos a borrar',
+      message: '¿Estás seguro? ¿Desea eliminarlo?',
       buttons: [
         {
           text: 'No',
@@ -112,9 +108,8 @@ export class DetallePage implements OnInit {
           text: 'Sí!',
           handler: () => {
             console.log('Qué más dá');
-            this.borrarImagen();
-            this.firestoreService.borrar("herramientas", this.document.id).then(() => {
-              this.obtenerListaHerramientas();
+            this.firestoreService.borrar("vehiculos", this.document.id).then(() => {
+              this.obtenerListaVehiculos();
               this.tiendaEditando = {} as Tienda;
             })
           }
@@ -127,101 +122,12 @@ export class DetallePage implements OnInit {
   }
 
   clicBotonModificar(){
-    this.firestoreService.actualizar("herramientas", this.document.id, this.document.data).then(() => {
-      this.obtenerListaHerramientas();
+    this.firestoreService.actualizar("vehiculos", this.document.id, this.document.data).then(() => {
+      this.obtenerListaVehiculos();
       this.tiendaEditando = {} as Tienda;
     });
   }
-  
-  
 
-  async uploadImagePicker(){
-    const loading = await this.loadingController.create({
-      message: 'Please wait...'
-    });
-    const toast = await this.toastConstroller.create({
-      message: 'Image was updated successfully',
-      duration: 3000
-    });
-    this.imagePicker.hasReadPermission().then(
-      (result) => {
-        if(result == false){
-          this.imagePicker.requestReadPermission();
-        }
-        else{
-          this.imagePicker.getPictures({
-            maximumImagesCount: 1,
-            outputType: 1
-          }).then(
-            (results) => {
-              let imagenes = "imagenes";
-              for (var i = 0; i < results.length; i++) {
-                loading.present();
-                let herramienta = `${new Date().getTime()}`;
-                this.firestoreService.uploadImage(imagenes, herramienta, results[i])
-                .then(snapshot=> {
-                  snapshot.ref.getDownloadURL()
-                  .then(downloadURL => {
-                    console.log("downloadURL:" + downloadURL);
-                    this.document.data.imagen= downloadURL;
-                    this.imageURL=this.document.data.imagen;
-                    toast.present();
-                    loading.dismiss();
-                  })
-                })
-              }
-            },
-            (err) => {
-              console.log(err)
-            }
-          );
-        }
-      }, (err) => {
-        console.log(err);
-      });
-  }
-  private borrarImagen(){
-    this.deleteFile(this.document.data.imagen);
-    this.document.data.imagen = null;
-  }
-  async deleteFile(fileURL) {
-    const toast = await this.toastConstroller.create({
-      message: 'File was deleted successfully',
-      duration: 3000
-    });
-    this.firestoreService.deleteFileFromURL(fileURL)
-    .then(() => {
-      this.document.data.imagen="";
-      toast.present();
-    }, (err) => {
-      console.log(err);
-    });
-  }
-  
-  ShareGeneric(){
-    //const url = this.link
-    //const text = parameter+'\n'
-    this.socialSharing.share(this.document.data.titulo, 'MEDIUM', null, this.document.data.imagen);
-  }
-  ShareWhatsapp(){
-    this.socialSharing.shareViaWhatsApp(this.document.data.titulo, this.document.data.imagen, null)
-  }
-
-  ShareFacebook(){
-    this.socialSharing.shareViaFacebookWithPasteMessageHint(this.document.data.titulo, this.document.data.imagen, null /* url */, 'Copia Pega!')
-  }
-
-  SendEmail(){
-    this.socialSharing.shareViaEmail('text', 'subject', ['email@address.com'])
-  }
-
-  SendTwitter(){
-    this.socialSharing.shareViaTwitter(this.document.data.titulo, this.document.data.imagen, null)
-  }
-
-  SendInstagram(){
-    this.socialSharing.shareViaInstagram(this.document.data.titulo, this.document.data.imagen)
-  }
   ionViewDidEnter(){
     this.isLogged = false;
     this.afAuth.user.subscribe(user =>{

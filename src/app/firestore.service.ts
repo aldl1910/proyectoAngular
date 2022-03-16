@@ -26,12 +26,4 @@ export class FirestoreService {
   public consultarPorId(coleccion, documentId) {
     return this.angularFirestore.collection(coleccion).doc(documentId).snapshotChanges();
   }
-  public uploadImage (imagenes, herramienta, imagenBase64) {
-    let storageRef = 
-    this.angularFireStorage.ref(imagenes).child(herramienta);
-    return storageRef.putString("data:image/jpeg;base64,"+ imagenBase64, 'data_url');
-  }
-  public deleteFileFromURL (fileURL) {
-    return this.angularFireStorage.storage.refFromURL(fileURL).delete();
-  }
 }

@@ -1,27 +1,29 @@
 <ion-header [translucent]="true">
   <ion-toolbar class="titt2">
     <ion-title>
-      Tienda de herramientas
+      Tienda de vehículos
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-input [(ngModel)]="filtro" class="inpu1" placeholder="Introduce los datos del filtro"></ion-input>
-  <h1 class="ha1">LISTA DE HERRAMIENTAS</h1>
+  <br>
+  <hr color="white" size="2">
+  <h1 class="ha1">LISTA DE VEHÍCULOS</h1>
     <ion-fab vertical="bottom" horizontal="end"  slot="fixed">
       <ion-fab-button (click)="segundaPantalla()" color="danger"><ion-icon name="add"></ion-icon></ion-fab-button>
     </ion-fab>
       <ion-grid class="contenido">
       <ion-row>
         <ng-container *ngFor="let documentTienda of arrayColeccionTienda">
-        <ion-col *ngIf="filtro=='' || documentTienda.data.titulo.includes(filtro)" size-xl="2" size-lg="2" size-md="4" size-sm="6" size-xs="12">
+        <ion-col *ngIf="filtro=='' || documentTienda.data.marca.includes(filtro)" size-xl="2" size-lg="2" size-md="4" size-sm="6" size-xs="12">
           <ion-card class="tarjetas"  (click)="selecHerramienta(documentTienda)">
             <ion-card-content>
                 <img src="{{documentTienda.data.imagen}}">
-                <h2>{{documentTienda.data.titulo}}</h2>
+                <h2>{{documentTienda.data.marca}}</h2>
+                <h2>{{documentTienda.data.modelo}}</h2>
                 <p>{{documentTienda.data.precio}} €</p>
-                <p>{{documentTienda.data.descripcion}}</p>
             </ion-card-content>
           </ion-card>
         </ion-col>
